@@ -43,7 +43,6 @@ class MyListener(StreamListener):
         try:
             with open(self.outfile, 'a') as f:
                 f.write(data)
-                print(data)
                 return True
         except BaseException as e:
             print("Error on_data: %s" % str(e))
@@ -95,4 +94,14 @@ if __name__ == '__main__':
 
     twitter_stream = Stream(auth, MyListener(args.data_dir, args.query))
     query = list(args.query)
-    twitter_stream.filter(track=query)
+    twitter_stream.filter(track=['python'])
+
+
+
+####################
+# Another approach to scrap twits
+# TODO: Ver bien el manejo y filtrado de twits con "twitterscraper"
+# Ejemplo:
+# for tweet in query_tweets("lunes OR fiaca", 10)[:10]:
+#     print("-------")
+#     print(tweet.text)

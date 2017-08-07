@@ -1,4 +1,4 @@
-consumer_key = 'your-consumer-key'
-consumer_secret = 'your-consumer-secret'
-access_token = 'your-access-token'
-access_secret = 'your-access-secret'
+consumer_key = 'XX'
+consumer_secret = 'XX'
+access_token = 'XX'
+access_secret = 'XX'
