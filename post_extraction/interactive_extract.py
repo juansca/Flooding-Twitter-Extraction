@@ -1,3 +1,13 @@
+'''Use example:
+
+exit or more> more
+number of twits> 20
+daterange of twits> '2015-02-1, 2015-02-10'
+keywords> 'inundación, Sierras Chicas'
+geolocalization> 'Córdoba, Argentina, 100'
+filename where save twits> twit
+exit or more> exit
+'''
 from twitterscraper import query_tweets
 
 
