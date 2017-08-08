@@ -6,14 +6,13 @@ Usage:
 
 Options:
   -n <n>        Number of tweets [default: 10]
-  -d <date>     Date the tweets were (format: ).
-  -w <words>    Keywords to lookfor (list of string)
-  -g <geo>      Geolocalization for the tweets (City, Country)
+  -d <date>     Date the tweets were (format: 'yyyy1-mm1-dd1, yyyy2-mm2-dd2').
+  -w <words>    Keywords to lookfor (format: 'kw1, kw2, ...')
+  -g <geo>      Geolocalization for the tweets (format: 'City, Country' )
   -o <file>     Output tweets file.
   -h --help     Show this screen.
 """
 from docopt import docopt
-import pickle
 from twitterscraper import query_tweets
 # from twitterscraper import query_tweets_once
 
@@ -35,14 +34,8 @@ if __name__ == '__main__':
 
     adv_query = query + location + date + '&src=typd'
 
-    for tweet in query_tweets(adv_query, 10)[:n]:
-        print("-------")
-        print(tweet.text)
-
-####################
-# Another approach to scrap twits
-# TODO: Ver bien el manejo y filtrado de twits con "twitterscraper"
-# Ejemplo:
-# for tweet in query_tweets("lunes OR fiaca", 10)[:10]:
-#     print("-------")
-#     print(tweet.text)
+    # Collect and save tweets
+    filename = opts['-o']
+    with open(filename, "w") as f:
+        for tweet in query_tweets(adv_query, 10)[:n]:
+            print(tweet.text, file=f)
