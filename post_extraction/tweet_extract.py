@@ -19,6 +19,7 @@ python post_extraction/tweet_dwnld.py -n 200 -d '2015-01-1, 2015-03-8' -w 'inund
 """
 from docopt import docopt
 from twitterscraper import query_tweets
+from format_input import create_query
 
 
 if __name__ == '__main__':
@@ -27,27 +28,11 @@ if __name__ == '__main__':
         n = int(opts['-n'])
     else:
         n = None
-
-    # Format the input to use in twitterscraper methods.
-    # In https://github.com/taspinar/twitterscraper especifies that
-    # to use advanced queries we have to respect the query format
-    # implemented by twitter in his advanced search
-    # (https://twitter.com/search-advanced)
-    date = opts['-d'].split(', ')
-    date = 'since%3A' + date[0] + ' until%3A' + date[1]
-
-    loc = opts['-g'].split(', ')
-    location = ' near%3A' + '"' + loc[0] + '%2C ' + loc[1] + '" '
-    radio = 'within%3A' + loc[2] + 'mi '
-    location += radio
-
-    words = opts['-w'].split(', ')
-    query = 'q=' + words[len(words) - 1:][0]
-    for w in words[:len(words) - 1]:
-        query += ' OR ' + w
-
-    # Just join everything
-    adv_query = query + location + date + '&src=typd'
+    date = opts['-d']
+    loc = opts['-g']
+    words = opts['-w']
+    # Just join everything and create the query
+    adv_query = create_query(date, words, loc)
 
     # Collect and save tweets
     filename = 'tweets/' + opts['-o']
