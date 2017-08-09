@@ -49,6 +49,8 @@ while True:
             exit()
         elif fstr == 'more':
             n = ask('number of twits')
+            if n == 'all':
+                n = None
             d = ask('daterange of twits')
             w = ask('keywords')
             g = ask('geolocalization')
