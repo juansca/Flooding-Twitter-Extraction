@@ -95,6 +95,7 @@ def query_tweets_once(query, limit=None, num_tweets=0):
             if len(new_tweets) == 0:
                 logging.info("Got {} tweets for {}.".format(
                     len(tweets), query))
+
                 return tweets
 
             logging.info("Got {} tweets ({} new).".format(
@@ -142,6 +143,7 @@ def query_tweets(query, limit=None):
         logging.info("Running iteration no {}, query is {}".format(
             iteration, repr(query)))
         new_tweets = query_tweets_once(query, limit, len(tweets))
+
         tweets.extend(new_tweets)
 
         if not new_tweets:
@@ -149,6 +151,7 @@ def query_tweets(query, limit=None):
 
         mindate = min(map(lambda tweet: tweet.timestamp, new_tweets)).date()
         maxdate = max(map(lambda tweet: tweet.timestamp, new_tweets)).date()
+
         logging.info("Got tweets ranging from {} to {}".format(
             mindate.isoformat(), maxdate.isoformat()))
 

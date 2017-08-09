@@ -32,10 +32,11 @@ if __name__ == '__main__':
     loc = opts['-g']
     words = opts['-w']
     # Just join everything and create the query
+
     adv_query = create_query(date, words, loc)
 
     # Collect and save tweets
     filename = 'tweets/' + opts['-o']
     with open(filename, "w") as f:
         for tweet in query_tweets(adv_query, n)[:n]:
-            print(tweet.text, tweet.timestamp, file=f)
+            print(tweet.user, tweet.photo, tweet.timestamp, file=f)
