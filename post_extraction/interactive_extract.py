@@ -2,13 +2,13 @@
 
 exit or more> more
 number of twits> 20
-daterange of twits> '2015-02-1, 2015-02-10'
-keywords> 'inundación, Sierras Chicas'
-geolocalization> 'Córdoba, Argentina, 100'
+daterange of twits> '2015-02-10, 2015-02-20'
+keywords> 'inundación, Sierras Chicas, catastrofe, lluvia'
+geolocalization> 'Córdoba, Argentina, 200'
 filename where save twits> twit
 exit or more> exit
 '''
-from twitterscraper import query_tweets
+from twitterscraper.query import query_tweets
 from format_input import create_query
 
 

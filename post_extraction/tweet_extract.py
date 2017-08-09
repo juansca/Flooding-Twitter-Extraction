@@ -15,10 +15,10 @@ Options:
   -h --help     Show this screen.
 
 Example:
-python post_extraction/tweet_dwnld.py -n 200 -d '2015-01-1, 2015-03-8' -w 'inundación, Sierras Chicas, catastrofe' -g 'Sierras Chicas, Argentina, 150' -o holi
+python post_extraction/tweet_extract.py -n 30 -d '2015-02-10, 2015-02-20' -w 'inundación, Sierras Chicas, catastrofe, lluvia' -g 'Córdoba, Argentina, 200' -o holi
 """
 from docopt import docopt
-from twitterscraper import query_tweets
+from twitterscraper.query import query_tweets
 from format_input import create_query
 
 
@@ -38,4 +38,4 @@ if __name__ == '__main__':
     filename = 'tweets/' + opts['-o']
     with open(filename, "w") as f:
         for tweet in query_tweets(adv_query, n)[:n]:
-            print(tweet.text + 'EOT', file=f)
+            print(tweet.text, tweet.timestamp, file=f)
