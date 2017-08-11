@@ -20,6 +20,7 @@ python post_extraction/tweet_extract.py -n 30 -d '2015-02-10, 2015-02-20' -w 'in
 from docopt import docopt
 from twitterscraper.query import query_tweets
 from format_input import create_query
+import pickle
 
 
 if __name__ == '__main__':
@@ -36,7 +37,8 @@ if __name__ == '__main__':
     adv_query = create_query(date, words, loc)
 
     # Collect and save tweets
+    tweets = [tweet for tweet in query_tweets(adv_query, n)[:n]]
     filename = 'tweets/' + opts['-o']
-    with open(filename, "w") as f:
-        for tweet in query_tweets(adv_query, n)[:n]:
-            print(tweet.user, tweet.photo, tweet.timestamp, file=f)
+    with open(filename, "wb") as f:
+            pickle.dump(tweets, f)
+    f.close()
