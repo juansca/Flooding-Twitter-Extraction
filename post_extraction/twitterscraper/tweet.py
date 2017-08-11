@@ -19,6 +19,7 @@ class Tweet:
 
     @classmethod
     def from_soup_image(cls, tweet):
+        """Tweet object from tweets that has images attached."""
         return cls(
             user=tweet.find('span', 'username').text[1:],
             id=tweet['data-item-id'],
@@ -37,6 +38,7 @@ class Tweet:
 
     @classmethod
     def from_soup_text(cls, tweet):
+        """Tweet object from tweets that not necesary has images."""
         return cls(
             user=tweet.find('span', 'username').text[1:],
             id=tweet['data-item-id'],
@@ -53,9 +55,11 @@ class Tweet:
             photo=""
         )
 
-
     @classmethod
     def from_html(cls, html):
+        """Get tweets from the html taking as a parameter the two
+        'templates' defined before.
+        """
         soup = BeautifulSoup(html, "lxml")
         tweets = soup.find_all('li', 'js-stream-item')
         if tweets:
@@ -63,7 +67,7 @@ class Tweet:
                 try:
                     yield cls.from_soup_image(tweet)
                 except AttributeError:
-                    # If don't have image attached try getting without images
+                    # If don't have image attached try get without images
                     try:
                         yield cls.from_soup_text(tweet)
                     except AttributeError:
