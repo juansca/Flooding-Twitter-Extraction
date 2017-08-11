@@ -27,7 +27,6 @@ def textract(n, date, loc, words, filename):
     """Main script that extract and save tweets acording to the especifications.
     """
     # Just join everything and create the query
-
     adv_query = create_query(date, words, loc)
 
     # Collect and save tweets
