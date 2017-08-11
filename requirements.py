@@ -1,3 +1,4 @@
-tweepy==3.5.0
-twitterscraper
+re
 docopt
+pickle
+-e .  # install our code in editing mode

@@ -1,20 +1,29 @@
 import re
+import pickle
+
 
 class FloodingData:
     def __init__(self, filename):
-        pass
+        self.filename = filename
+
+    def _load_from_pickle(filename):
+        with open(filename, "rb") as f:
+            while True:
+                try:
+                    yield pickle.load(f)
+                except EOFError:
+                    break
 
     def urls_from_text(self):
-        # get tweets
-        urls = [re.search("(?P<url>https?://[^\s]+)",
-                tweet).group("url") for tweet in tweets]
-
+        filename = self.filename
+        for tweets in self._load_from_pickle(filename):
+            urls = [re.search("(?P<url>https?://[^\s]+)",
+                    tweet.text) for tweet in tweets]
+            urls = [url.group("url") for url in urls if url is not None]
         return urls
 
     def images_urls(self):
-        images = [tweet.photo for tweet in tweets]
-
-        return images
+        pass
 
     def videos(self):
         pass
