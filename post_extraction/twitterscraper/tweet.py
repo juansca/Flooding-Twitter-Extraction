@@ -18,7 +18,7 @@ class Tweet:
         self.photo = photo
 
     @classmethod
-    def from_soup(cls, tweet):
+    def from_soup_image(cls, tweet):
         return cls(
             user=tweet.find('span', 'username').text[1:],
             id=tweet['data-item-id'],
@@ -35,6 +35,23 @@ class Tweet:
             photo=tweet.find('div', 'AdaptiveMediaOuterContainer').find('div', 'AdaptiveMedia is-square ').find('div', 'AdaptiveMedia-container').find('div', 'AdaptiveMedia-singlePhoto').find('div', 'AdaptiveMedia-photoContainer js-adaptive-photo ').find('img', "")['src'] or ""
         )
 
+    @classmethod
+    def from_soup_text(cls, tweet):
+        return cls(
+            user=tweet.find('span', 'username').text[1:],
+            id=tweet['data-item-id'],
+            timestamp=datetime.utcfromtimestamp(
+                int(tweet.find('span', '_timestamp')['data-time'])),
+            fullname=tweet.find('strong', 'fullname').text,
+            text=tweet.find('p', 'tweet-text').text or "",
+            replies=tweet.find('div', 'ProfileTweet-action--reply').find('span',
+            'ProfileTweet-actionCountForPresentation').text or '0',
+            retweets=tweet.find('div', 'ProfileTweet-action--retweet').find('span',
+            'ProfileTweet-actionCountForPresentation').text or '0',
+            likes=tweet.find('div', 'ProfileTweet-action--favorite').find('span',
+            'ProfileTweet-actionCountForPresentation').text or '0',
+            photo=""
+        )
 
 
     @classmethod
@@ -44,6 +61,10 @@ class Tweet:
         if tweets:
             for tweet in tweets:
                 try:
-                    yield cls.from_soup(tweet)
+                    yield cls.from_soup_image(tweet)
                 except AttributeError:
-                    pass  # Incomplete info? Discard!
+                    # If don't have image attached try getting without images
+                    try:
+                        yield cls.from_soup_text(tweet)
+                    except AttributeError:
+                        pass  # Incomplete info? Discard!
