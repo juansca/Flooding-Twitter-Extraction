@@ -14,6 +14,13 @@ class FloodingData:
                 except EOFError:
                     break
 
+    def tweet_text(self):
+        """All tweets texts"""
+        filename = 'tweets/' + self.filename
+        for tweets in self._load_from_pickle(filename):
+            tweet_text = [tweet.text + "EOT" for tweet in tweets]
+        return tweet_text
+
     def urls_from_text(self):
         """Search urls in the text correspondly to tweets saved on the
         given file.
@@ -31,9 +38,9 @@ class FloodingData:
         """
         filename = 'tweets/' + self.filename
         for tweets in self._load_from_pickle(filename):
-            images_urls = [tweet.photo for tweet in tweets]
+            image_urls = [tweet.photo for tweet in tweets if tweet.photo != ""]
 
-        return images_urls
+        return image_urls
 
     def videos(self):
         pass
