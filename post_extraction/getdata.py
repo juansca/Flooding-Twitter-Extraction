@@ -15,6 +15,9 @@ class FloodingData:
                     break
 
     def urls_from_text(self):
+        """Search urls in the text correspondly to tweets saved on the
+        given file.
+        """
         filename = 'tweets/' + self.filename
         for tweets in self._load_from_pickle(filename):
             urls = [re.search("(?P<url>https?://[^\s]+)",
@@ -23,11 +26,14 @@ class FloodingData:
         return urls
 
     def images_urls(self):
+        """Search image urls attached in to tweets saved on the given
+        file.
+        """
         filename = 'tweets/' + self.filename
         for tweets in self._load_from_pickle(filename):
             images_urls = [tweet.photo for tweet in tweets]
 
         return images_urls
-        
+
     def videos(self):
         pass
