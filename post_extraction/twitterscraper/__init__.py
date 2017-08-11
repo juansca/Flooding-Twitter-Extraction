@@ -10,5 +10,5 @@ __author__ = 'Ahmet Taspinar'
 __license__ = 'MIT'
 
 
-from twitterscraper.query import query_tweets
-from twitterscraper.tweet import Tweet
+from post_extraction.twitterscraper.query import query_tweets
+from post_extraction.twitterscraper.tweet import Tweet

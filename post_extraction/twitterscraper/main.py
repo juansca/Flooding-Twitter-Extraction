@@ -9,8 +9,8 @@ from os.path import isfile
 from json import dump
 import logging
 
-from twitterscraper import query_tweets
-from twitterscraper.query import query_all_tweets
+from post_extraction.twitterscraper import query_tweets
+from post_extraction.twitterscraper.query import query_all_tweets
 
 
 class JSONEncoder(json.JSONEncoder):

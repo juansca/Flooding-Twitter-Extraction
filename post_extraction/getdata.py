@@ -6,7 +6,7 @@ class FloodingData:
     def __init__(self, filename):
         self.filename = filename
 
-    def _load_from_pickle(filename):
+    def _load_from_pickle(self, filename):
         with open(filename, "rb") as f:
             while True:
                 try:
@@ -15,7 +15,7 @@ class FloodingData:
                     break
 
     def urls_from_text(self):
-        filename = self.filename
+        filename = 'tweets/' + self.filename
         for tweets in self._load_from_pickle(filename):
             urls = [re.search("(?P<url>https?://[^\s]+)",
                     tweet.text) for tweet in tweets]
