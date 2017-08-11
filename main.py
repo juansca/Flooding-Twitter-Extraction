@@ -1,13 +1,19 @@
 import requests
+from imgkit import from_url
 from post_extraction.tweet_extract import textract
 from post_extraction.getdata import FloodingData
 
 
 def download_image(url, name):
     img_data = requests.get(url).content
-    name = 'images/' + name
+    name = 'images/tweets_attached/' + name
     with open(name + '.jpg', 'wb') as handler:
         handler.write(img_data)
+
+
+def webpage_screenshot(url, name):
+    filename = 'images/webpages_shots/' + name
+    from_url(url, filename + '.jpg')
 
 
 if __name__ == '__main__':
@@ -17,8 +23,19 @@ if __name__ == '__main__':
              "holi5")
 
     my_data5 = FloodingData("holi5")
+    text_5 = my_data5.tweet_text()
+    print(len(text_5))
+    print(text_5)
+
     urls_5 = my_data5.urls_from_text()
-    print(urls_5)
+    i = 0
+    for url in urls_5:
+        try:
+            webpage_screenshot(url, str(i))
+            i += 1
+        except:
+            pass
+
     for url in my_data5.images_urls():
         name = url.split('/')
         name = name[4]
