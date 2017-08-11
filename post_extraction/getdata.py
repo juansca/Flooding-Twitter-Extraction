@@ -23,7 +23,11 @@ class FloodingData:
         return urls
 
     def images_urls(self):
-        pass
+        filename = 'tweets/' + self.filename
+        for tweets in self._load_from_pickle(filename):
+            images_urls = [tweet.photo for tweet in tweets]
 
+        return images_urls
+        
     def videos(self):
         pass
