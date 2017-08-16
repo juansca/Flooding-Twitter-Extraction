@@ -1,4 +1,5 @@
-import requests
+import urllib.request
+from urllib.error import HTTPError
 from imgkit import from_url
 from post_extraction.tweet_extract import textract
 from post_extraction.getdata import FloodingData
@@ -6,10 +7,8 @@ from post_extraction.getdata import FloodingData
 
 def download_image(url, name):
     """Download a image from a url."""
-    img_data = requests.get(url).content
-    name = 'images/tweets_attached/' + name
-    with open(name + '.jpg', 'wb') as handler:
-        handler.write(img_data)
+    name = 'images_train/' + name + '.jpg'
+    urllib.request.urlretrieve(url, name)
 
 
 def webpage_screenshot(url, name):
@@ -20,13 +19,13 @@ def webpage_screenshot(url, name):
 
 if __name__ == '__main__':
     # Getting tweets
-    textract(30, "2015-02-10, 2015-02-20",
-             "Córdoba, Argentina, 200",
-             "inundación, Sierras Chicas, catastrofe, lluvia",
-             "holi5")
+    textract(250, "2017-08-9, 2017-08-14",
+             "Córdoba, Argentina, 500",
+             "elecciones, macri, cristina",
+             "holi6")
 
     # Getdata object
-    my_data5 = FloodingData("holi5")
+    my_data5 = FloodingData("holi6")
     text_5 = my_data5.tweet_text()
     print(len(text_5))
     print(text_5)
@@ -39,11 +38,22 @@ if __name__ == '__main__':
             webpage_screenshot(url, str(i))
             i += 1
         except:
-            pass
+            continue
 
     # Download the images attached on the tweets
+    print(my_data5.urls_from_text())
+    print(my_data5.images_urls())
+    i = 0
+    errors = []
     for url in my_data5.images_urls():
-        name = url.split('/')
-        name = name[4]
-        name = name[:len(name) - 4]
-        download_image(url, name)
+        i += 1
+        if url[:4] == 'http':
+            try:
+                download_image(url, str(i))
+            except HTTPError:
+                print("error in", url)
+                errors.append(url)
+        if i % 20 == 0:
+            print(i, "images downloaded")
+    print("The number of erros in downloading all file is", len(errors))
+    print(errors)
