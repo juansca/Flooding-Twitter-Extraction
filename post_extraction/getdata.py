@@ -42,5 +42,12 @@ class FloodingData:
 
         return image_urls
 
-    def videos(self):
-        pass
+    def videos_urls(self):
+        """Search video urls attached in to tweets saved on the given
+        file.
+        """
+        filename = 'tweets/' + self.filename
+        for tweets in self._load_from_pickle(filename):
+            image_urls = [tweet.video for tweet in tweets if tweet.photo != ""]
+
+        return image_urls
