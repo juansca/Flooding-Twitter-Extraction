@@ -33,7 +33,10 @@ class Tweet:
             'ProfileTweet-actionCountForPresentation').text or '0',
             likes=tweet.find('div', 'ProfileTweet-action--favorite').find('span',
             'ProfileTweet-actionCountForPresentation').text or '0',
-            photo=tweet.find('div', 'AdaptiveMediaOuterContainer').find('div', 'AdaptiveMedia is-square ').find('div', 'AdaptiveMedia-container').find('div', 'AdaptiveMedia-singlePhoto').find('div', 'AdaptiveMedia-photoContainer js-adaptive-photo ').find('img', "")['src'] or ""
+            photo=tweet.find('div', 'AdaptiveMediaOuterContainer').find('div',
+            'AdaptiveMedia is-square ').find('div', 'AdaptiveMedia-container').find('div',
+            'AdaptiveMedia-singlePhoto').find('div',
+            'AdaptiveMedia-photoContainer js-adaptive-photo ').find('img', "")['src'] or ""
         )
 
     @classmethod
