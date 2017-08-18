@@ -1,9 +1,22 @@
 import numpy as np
 import tensorflow as tf
 
-imagePath = 'vicios.jpg'
+imagePath = 'rio.jpg'
 modelFullPath = 'retrained_graph.pb'
 labelsFullPath = 'retrained_labels.txt'
+
+
+def format_from_label(label):
+    """Just format from label tensorflow classifier output.
+    The input format is (correspondly to the tensorflow output):
+        "b'LABEL\\n'"
+    The output format is:
+        'LABEL'
+    """
+    label = label.split('\'')
+    label = label[1].split('\\')
+    label = label[0]
+    return label
 
 
 def create_graph():
@@ -43,7 +56,8 @@ def run_inference_on_image(imagePath):
             score = predictions[node_id]
             print('%s (score = %.5f)' % (human_string, score))
 
-        answer = labels[top_k[0]], predictions[top_k[0]]
+        label = format_from_label(labels[top_k[0]])
+        answer = label, predictions[top_k[0]]
         return answer
 
 
