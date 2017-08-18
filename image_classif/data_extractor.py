@@ -26,7 +26,7 @@ def download_image(dclass, url, name):
 
 if __name__ == '__main__':
 
-    data_classes = ['data_flood', 'data_river']
+    data_classes = ['data_flood', 'data_river', 'neither']
     for dclass in data_classes:
         print("\n\nDownloading files from", dclass)
         with open(dclass + '.txt', 'r') as data:
