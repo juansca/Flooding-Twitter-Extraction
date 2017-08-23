@@ -103,3 +103,8 @@ ENV/
 *config.py
 /tweets/*
 *.jpg
+*.tar.*
+map_filtering/basemap-1.1.0/*
+map_filtering/geos-3.4.2/*
+map_filtering/proj-4.9.1/*
+map_filtering/pyproj/*

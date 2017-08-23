@@ -16,6 +16,9 @@ These are external packages which you will need to install before installing bas
 
 - [PROJ4](http://proj4.org)  Cartographic Projections Library.
 
+- [pyproj](https://github.com/jswhit/pyproj)
+
+- [pyshp](https://github.com/GeospatialPython/pyshp)
 
 ### Required library that ships with basemap
 
@@ -33,6 +36,19 @@ $ pip install -r requirements.py
 ```
 To install them, you have to be in 'Flooding-Twitter-Extraction' (the main)
 directory
+
+
+### **pyproj**
+
+clone github repo or download source release at http://python.org/pypi/pyproj.
+    If you clone the github repo, Cython is a dependency.
+
+```
+$ git clone git@github.com:jswhit/pyproj.git
+$ cd pyproj
+$ python setup.py build
+$ python setup.py install # (with sudo if necessary).
+```
 
 ### **PROJ4**
 
@@ -57,7 +73,7 @@ $ cd ..
 Finally, configure, make and install PROJ.4:
 ```
 $ ./configure
-$ make
+$ sudo make
 $ sudo make install
 $ cd ..
 ```
@@ -79,6 +95,7 @@ $ ./configure
 $ make
 $ sudo make install
 $ cd ..
+$ sudo apt-get install libgeos-dev
 ```
 
 ### BaseMap
@@ -88,6 +105,6 @@ install it.
 ```
 $ wget https://github.com/matplotlib/basemap/archive/v1.1.0.tar.gz
 $ tar xzf v1.1.0.tar.gz
-$ cd ALGUNLADO
+$ cd basemap-1.1.0
 $ python setup.py install
 ```
