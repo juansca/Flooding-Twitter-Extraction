@@ -1,66 +1,85 @@
 import numpy as np
 import tensorflow as tf
+from os import listdir
+
 
 imagePath = 'rio.jpg'
 modelFullPath = 'retrained_graph.pb'
 labelsFullPath = 'retrained_labels.txt'
 
 
-def format_from_label(label):
-    """Just format from label tensorflow classifier output.
-    The input format is (correspondly to the tensorflow output):
-        "b'LABEL\\n'"
-    The output format is:
-        'LABEL'
-    """
-    label = label.split('\'')
-    label = label[1].split('\\')
-    label = label[0]
-    return label
+class ImageClassifier():
+    def __init__(self, path_dir=None):
+        self.path_dir = path_dir
 
+    def classify_dir(self):
+        """Run inference on image over all images on give directory.
+        Returns an iterator for performance.
+        """
+        path_dir = self.path_dir
+        files = (path_dir + f for f in listdir(path_dir))
+        for image in files:
+            yield self._run_inference_on_image(image)
 
-def create_graph():
-    """Creates a graph from saved GraphDef file and returns a saver."""
-    # Creates graph from saved graph_def.pb.
-    with tf.gfile.FastGFile(modelFullPath, 'rb') as f:
-        graph_def = tf.GraphDef()
-        graph_def.ParseFromString(f.read())
-        _ = tf.import_graph_def(graph_def, name='')
+    def classify_file(self, imagePath):
+        """Run inference on only one image.
+        To test the classifier."""
+        imagePath = self.imagePath
+        return self._run_inference_on_image(imagePath)
 
+    def _format_from_label(self, label):
+        """Just format from label tensorflow classifier output.
+        The input format is (correspondly to the tensorflow output):
+            "b'LABEL\\n'"
+        The output format is:
+            'LABEL'
+        """
+        label = label.split('\'')
+        label = label[1].split('\\')
+        label = label[0]
+        return label
 
-def run_inference_on_image(imagePath):
-    answer = None
+    def _create_graph(self):
+        """Creates a graph from saved GraphDef file and returns a saver."""
+        # Creates graph from saved graph_def.pb.
+        with tf.gfile.FastGFile(modelFullPath, 'rb') as f:
+            graph_def = tf.GraphDef()
+            graph_def.ParseFromString(f.read())
+            _ = tf.import_graph_def(graph_def, name='')
 
-    if not tf.gfile.Exists(imagePath):
-        tf.logging.fatal('File does not exist %s', imagePath)
-        return answer
+    def _run_inference_on_image(self, imagePath):
+        answer = None
 
-    image_data = tf.gfile.FastGFile(imagePath, 'rb').read()
+        if not tf.gfile.Exists(imagePath):
+            tf.logging.fatal('File does not exist %s', imagePath)
+            return answer
 
-    # Creates graph from saved GraphDef.
-    create_graph()
+        image_data = tf.gfile.FastGFile(imagePath, 'rb').read()
 
-    with tf.Session() as sess:
+        # Creates graph from saved GraphDef.
+        self._create_graph()
 
-        softmax_tensor = sess.graph.get_tensor_by_name('final_result:0')
-        predictions = sess.run(softmax_tensor,
-                               {'DecodeJpeg/contents:0': image_data})
-        predictions = np.squeeze(predictions)
+        with tf.Session() as sess:
 
-        top_k = predictions.argsort()[-5:][::-1]  # Getting top 5 predictions
-        f = open(labelsFullPath, 'rb')
-        lines = f.readlines()
-        labels = [str(w).replace("\n", "") for w in lines]
-        for node_id in top_k:
-            human_string = labels[node_id]
-            score = predictions[node_id]
-            print('%s (score = %.5f)' % (human_string, score))
+            softmax_tensor = sess.graph.get_tensor_by_name('final_result:0')
+            predictions = sess.run(softmax_tensor,
+                                   {'DecodeJpeg/contents:0': image_data})
+            predictions = np.squeeze(predictions)
 
-        label = format_from_label(labels[top_k[0]])
-        answer = label, predictions[top_k[0]]
-        return answer
+            top_k = predictions.argsort()[-5:][::-1]  # Get top 5 predictions
+            f = open(labelsFullPath, 'rb')
+            lines = f.readlines()
+            labels = [str(w).replace("\n", "") for w in lines]
+            for node_id in top_k:
+                human_string = labels[node_id]
+                score = predictions[node_id]
+                print('%s (score = %.5f)' % (human_string, score))
+
+            label = self._format_from_label(labels[top_k[0]])
+            answer = label, predictions[top_k[0]]
+            return answer
 
 
 if __name__ == '__main__':
-    a = run_inference_on_image(imagePath)
-    print(a)
+    a = Image_Classifier()
+    print(a.classify_file(imagePath))
