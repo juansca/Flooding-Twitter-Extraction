@@ -4,8 +4,8 @@ from os import listdir
 
 
 imagePath = 'rio.jpg'
-modelFullPath = 'retrained_graph.pb'
-labelsFullPath = 'retrained_labels.txt'
+modelFullPath = 'image_classif/retrained_graph.pb'
+labelsFullPath = 'image_classif/retrained_labels.txt'
 
 
 class ImageClassifier():
@@ -19,7 +19,10 @@ class ImageClassifier():
         path_dir = self.path_dir
         files = (path_dir + f for f in listdir(path_dir))
         for image in files:
-            yield self._run_inference_on_image(image)
+            try:
+                yield (image, self._run_inference_on_image(image))
+            except tf.errors.InvalidArgumentError:
+                print(image)
 
     def classify_file(self, imagePath):
         """Run inference on only one image.
