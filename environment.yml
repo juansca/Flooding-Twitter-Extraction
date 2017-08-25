@@ -1,0 +1,8 @@
+name: FloodTwitExt
+
+dependencies:
+  - docopt
+  - matplotlib
+  - numpy
+  - Cython
+  - tensorflow
