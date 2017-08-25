@@ -26,7 +26,7 @@ class Query():
             tso = TwitterSearchOrder()
             tso.set_keywords(keywords)  # we want to see 'keywords' tweets only
             tso.set_language('es')  # Only in Spanish
-            tso.set_include_entities(True)  # all those entity information
+            tso.set_include_entities(media)  # all those entity information
             if urls:
                 tso.set_link_filter()  # urls on tweets
 
@@ -51,22 +51,25 @@ class Query():
 
                 # check if there are statuses returned and whether we still
                 # have work to do. We NEED geolocalization of the tweets
-                metadata = len(response['content']['search_metadata']) == 0
-                coordinates = response['content']['statuses'][0]['coordinates']
-                geo = response['content']['statuses'][0]['geo']
-                if (coordinates is None and geo is None) or not metadata:
-                    continue
+
+                metadata = len(response['content']['search_metadata']) != 0
 
                 # check all tweets according to their ID
                 for tweet in response['content']['statuses']:
-                    tweet_id = tweet['id']
+                    coordinates = tweet['coordinates']
+                    geo = tweet['geo']
+                    if coordinates is None and geo is None:
+                        tweet_id = tweet['id']
+                        # current ID is lower than current next_max_id?
+                        if (tweet_id < next_max_id) or (next_max_id == 0):
+                            next_max_id = tweet_id
+                            next_max_id -= 1  # decrement to avoid seeing this tweet again
+                        continue
 
-                    # current ID is lower than current next_max_id?
-                    if (tweet_id < next_max_id) or (next_max_id == 0):
-                        next_max_id = tweet_id
-                        next_max_id -= 1  # decrement to avoid seeing this tweet again
                     yield tweet
 
+                if not metadata:
+                    break
                 # set lowest ID as MaxID
                 tweets -= 1
                 progress(format_str.format(ntweets - tweets, tweets))
@@ -78,4 +81,5 @@ class Query():
 
 if __name__ == '__main__':
     q = Query(["cristina", "macri"])
-    q.search(media=False, urls=False)
+    for tweet in q.search(media=True, urls=True):
+        print(tweet['id'])
