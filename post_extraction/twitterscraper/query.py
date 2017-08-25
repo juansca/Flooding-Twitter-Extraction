@@ -52,10 +52,9 @@ class Query():
                 # check if there are statuses returned and whether we still
                 # have work to do. We NEED geolocalization of the tweets
                 metadata = len(response['content']['search_metadata']) == 0
-                geo = not response['content']['statuses'][0]['coordinates']
-                geo2 = not response['content']['statuses'][0]['geo']
-                if not geo and not geo2:
-                    print("holis3")
+                coordinates = response['content']['statuses'][0]['coordinates']
+                geo = response['content']['statuses'][0]['geo']
+                if (coordinates is None and geo is None) or not metadata:
                     continue
 
                 # check all tweets according to their ID
