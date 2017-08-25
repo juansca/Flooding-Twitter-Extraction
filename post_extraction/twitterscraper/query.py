@@ -1,3 +1,4 @@
+import datetime
 import sys
 from config import consumer_key, consumer_secret
 from config import access_token, access_token_secret
@@ -18,7 +19,7 @@ class Query():
         self.keywords = keywords
         self.ntweets = ntweets
 
-    def search(self, media=True, urls=True):
+    def search(self, media=True, urls=True, until=False, localization=False):
         keywords = self.keywords
         ntweets = self.ntweets
 
@@ -27,6 +28,10 @@ class Query():
             tso.set_keywords(keywords)  # we want to see 'keywords' tweets only
             tso.set_language('es')  # Only in Spanish
             tso.set_include_entities(media)  # all those entity information
+            if until:
+                until = datetime.datetime.strptime(until, "%Y-%m-%d").date()
+                print(isinstance(until, datetime.date))
+                tso.set_until(until)
             if urls:
                 tso.set_link_filter()  # urls on tweets
 
@@ -44,7 +49,8 @@ class Query():
             progress(format_str.format(0, ntweets))
             # let's start the action
             tweets = ntweets
-            while(tweets >= 0):
+            metadata = True
+            while(tweets >= 0 and metadata):
 
                 # Query the Twitter API
                 response = ts.search_tweets(tso)
@@ -56,20 +62,19 @@ class Query():
 
                 # check all tweets according to their ID
                 for tweet in response['content']['statuses']:
-                    coordinates = tweet['coordinates']
-                    geo = tweet['geo']
-                    if coordinates is None and geo is None:
-                        tweet_id = tweet['id']
-                        # current ID is lower than current next_max_id?
-                        if (tweet_id < next_max_id) or (next_max_id == 0):
-                            next_max_id = tweet_id
-                            next_max_id -= 1  # decrement to avoid seeing this tweet again
-                        continue
+                    tweet_id = tweet['id']
+                    # current ID is lower than current next_max_id?
+                    if (tweet_id < next_max_id) or (next_max_id == 0):
+                        next_max_id = tweet_id
+                        next_max_id -= 1  # decrement to avoid seeing this tweet again
 
+                    if localization:
+                        coordinates = tweet['coordinates'] is not None
+                        geo = tweet['geo'] is not None
+                        if not coordinates and not geo:
+                            continue
                     yield tweet
 
-                if not metadata:
-                    break
                 # set lowest ID as MaxID
                 tweets -= 1
                 progress(format_str.format(ntweets - tweets, tweets))
