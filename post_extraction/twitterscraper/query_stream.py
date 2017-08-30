@@ -15,15 +15,15 @@ def progress(msg, width=None):
 
 
 class Query():
-    def __init__(self, keywords, ntweets=100):
+    def __init__(self, keywords):
         self.keywords = keywords
-        self.ntweets = ntweets
 
     def search(self, media=True, urls=True, until=False,
                localization=False,  # TODO: Any tweets found with 'True'
                latitude=-31.4135000, longitude=-64.1810500, radius=50):
+        """Query for tweets
+        """
         keywords = self.keywords
-        ntweets = self.ntweets
 
         try:
             tso = TwitterSearchOrder()
@@ -48,14 +48,13 @@ class Query():
 
             next_max_id = 0
 
-            format_str = '{} tweets downloaded. {} remaining'
+            format_str = '{} tweets downloaded.'
 
-            progress(format_str.format(0, ntweets))
+            progress(format_str.format(0))
             # let's start the action
-            tweets = ntweets
+            tweets = 0
             metadata = True
-            print(metadata)
-            while(tweets >= 0 and metadata):
+            while(metadata):
 
                 # Query the Twitter API
                 response = ts.search_tweets(tso)
@@ -77,11 +76,11 @@ class Query():
                         geo = tweet['geo'] is not None
                         if not coordinates and not geo:
                             continue
+                    tweets += 1
+                    progress(format_str.format(tweets))
                     yield tweet
 
                 # set lowest ID as MaxID
-                tweets -= 1
-                progress(format_str.format(ntweets - tweets, tweets))
                 tso.set_max_id(next_max_id)
 
         except TwitterSearchException as e:
@@ -91,4 +90,4 @@ class Query():
 if __name__ == '__main__':
     q = Query(["cristina", "macri"])
     for tweet in q.search(media=True, urls=True):
-        print(tweet['id'])
+        pass
