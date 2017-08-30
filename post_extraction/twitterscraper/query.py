@@ -19,7 +19,9 @@ class Query():
         self.keywords = keywords
         self.ntweets = ntweets
 
-    def search(self, media=True, urls=True, until=False, localization=False):
+    def search(self, media=True, urls=True, until=False,
+               localization=False,  # TODO: Any tweets found with 'True'
+               latitude=-31.4135000, longitude=-64.1810500, radius=50):
         keywords = self.keywords
         ntweets = self.ntweets
 
@@ -28,6 +30,8 @@ class Query():
             tso.set_keywords(keywords)  # we want to see 'keywords' tweets only
             tso.set_language('es')  # Only in Spanish
             tso.set_include_entities(media)  # all those entity information
+            tso.set_geocode(latitude, longitude, radius, imperial_metric=False)
+
             if until:
                 until = datetime.datetime.strptime(until, "%Y-%m-%d").date()
                 print(isinstance(until, datetime.date))
@@ -50,11 +54,11 @@ class Query():
             # let's start the action
             tweets = ntweets
             metadata = True
+            print(metadata)
             while(tweets >= 0 and metadata):
 
                 # Query the Twitter API
                 response = ts.search_tweets(tso)
-
                 # check if there are statuses returned and whether we still
                 # have work to do. We NEED geolocalization of the tweets
 
