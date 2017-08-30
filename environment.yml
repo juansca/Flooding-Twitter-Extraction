@@ -7,3 +7,9 @@ dependencies:
   - Cython
   - tensorflow
   - requests
+  - pip
+  - pip:
+      - geopy
+      - pyshp
+      - imgkit
+      - TwitterSearch

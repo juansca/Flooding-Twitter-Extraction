@@ -1,3 +1,0 @@
-pyshp
-imgkit
-TwitterSearch
