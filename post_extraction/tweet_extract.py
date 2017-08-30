@@ -15,25 +15,72 @@ Options:
   -h --help     Show this screen.
 
 Example:
-python post_extraction/tweet_extract.py -n 30 -d '2015-02-10, 2015-02-20' -w 'inundación, Sierras Chicas, catastrofe, lluvia' -g 'Córdoba, Argentina, 200' -o holi
+python post_extraction/tweet_extract.py -n 30 -d '2015-02-10, 2015-02-20' -w 'inundación, Sierras Chicas, catastrofe, lluvia' -g 'Córdoba Argentina, 200' -o holi
 """
 from docopt import docopt
-from post_extraction.twitterscraper.query import query_tweets
-from post_extraction.format_input import create_query
+from geopy.geocoders import Nominatim
+from adv_query.query import query_tweets
+from stream_query.query import Query
+from format_input import create_query
 import pickle
 
 
-def textract(n, date, loc, words, filename):
-    """Main script that extract and save tweets acording to the especifications.
-    """
-    # Just join everything and create the query
-    adv_query = create_query(date, words, loc)
+class AttrDict(dict):
+    def __init__(self, *args, **kwargs):
+        super(AttrDict, self).__init__(*args, **kwargs)
+        self.__dict__ = self
 
-    # Collect and save tweets
-    tweets = [tweet for tweet in query_tweets(adv_query, n)[:n]]
-    filename = 'tweets/' + filename
-    with open(filename, "wb") as f:
+
+def textract(n, date, loc, words, filename, stream=True):
+    """Main script that extract and save tweets acording to the especifications.
+
+    :param n: Only used if stream=False
+    :param date: Only used if stream=False
+    :param loc: Geolocalization coordinates in --> (City Country, radius)
+                format.
+    :param stream: Bool that specifies if Twitter streamming API or
+                   twitterscraper library will be used to query tweets.
+    """
+    if not stream:
+        # Just join everything and create the query
+        adv_query = create_query(date, words, loc)
+        tweets = [tweet for tweet in query_tweets(adv_query, n)[:n]]
+        filename = 'tweets/from_adv_search/' + filename
+        with open(filename, "wb") as f:
             pickle.dump(tweets, f)
+        f.close()
+
+    else:
+        place = loc[0]
+        geolocator = Nominatim()
+        location = geolocator.geocode(place)
+        latitude = location.latitude
+        longitude = location.longitude
+        radius = loc[1]
+        words = words.split(', ')
+        query = Query(words)
+
+        i = 0
+        try:
+            # Collect and Save tweets
+            for tweet in query.search(latitude=latitude,
+                                      longitude=longitude,
+                                      radius=radius):
+
+                if i % 100 == 0:  # Save tweets
+                    save_stream_data(filename, tweet, i)
+                i += 1
+        except KeyboardInterrupt:
+            save_stream_data(filename, tweet, i)
+
+
+def save_stream_data(filename, data, i):
+    act_file = filename + '_' + str(i)
+    act_file = 'tweets/from_stream/' + act_file
+    t = AttrDict()
+    t.update(data)
+    with open(filename, "wb") as f:
+        pickle.dump(t, f)
     f.close()
 
 
