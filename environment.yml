@@ -13,3 +13,4 @@ dependencies:
       - pyshp
       - imgkit
       - TwitterSearch
+      - -e .

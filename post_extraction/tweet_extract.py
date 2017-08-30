@@ -18,10 +18,12 @@ Example:
 python post_extraction/tweet_extract.py -n 30 -d '2015-02-10, 2015-02-20' -w 'inundación, Sierras Chicas, catastrofe, lluvia' -g 'Córdoba Argentina, 200' -o holi
 """
 from docopt import docopt
+import urllib
+import time
 from geopy.geocoders import Nominatim
-from adv_query.query import query_tweets
-from stream_query.query import Query
-from format_input import create_query
+from post_extraction.twitterscraper.adv_query.query import query_tweets
+from post_extraction.twitterscraper.stream_query.query import Query
+from post_extraction.format_input import create_query
 import pickle
 
 
@@ -31,7 +33,7 @@ class AttrDict(dict):
         self.__dict__ = self
 
 
-def textract(n, date, loc, words, filename, stream=True):
+def textract(loc, words, filename, n=10, date=None, stream=True):
     """Main script that extract and save tweets acording to the especifications.
 
     :param n: Only used if stream=False
@@ -42,6 +44,7 @@ def textract(n, date, loc, words, filename, stream=True):
                    twitterscraper library will be used to query tweets.
     """
     if not stream:
+        print("Advanced Query scrapping starting...")
         # Just join everything and create the query
         adv_query = create_query(date, words, loc)
         tweets = [tweet for tweet in query_tweets(adv_query, n)[:n]]
@@ -51,35 +54,49 @@ def textract(n, date, loc, words, filename, stream=True):
         f.close()
 
     else:
+        print("Streamming scrapping starting...")
+        loc = loc.split(', ')
         place = loc[0]
         geolocator = Nominatim()
-        location = geolocator.geocode(place)
+        location = geolocator.geocode(place, timeout=None)
         latitude = location.latitude
         longitude = location.longitude
-        radius = loc[1]
+        radius = int(loc[1])
         words = words.split(', ')
         query = Query(words)
 
-        i = 0
+        i = 1
+        tweets = []
         try:
             # Collect and Save tweets
             for tweet in query.search(latitude=latitude,
                                       longitude=longitude,
                                       radius=radius):
-
-                if i % 100 == 0:  # Save tweets
-                    save_stream_data(filename, tweet, i)
+                tweet['latitude'] = latitude
+                tweet['longitude'] = longitude
+                tweets.append(tweet)
+                if i % 10 == 0:  # Save tweets
+                    save_stream_data(filename, tweets, i)
+                    tweets = []
                 i += 1
-        except KeyboardInterrupt:
-            save_stream_data(filename, tweet, i)
+                print("holi")
+        except KeyboardInterrupt as k:
+            print("\nSaving the remaining tweets collected...")
+            if tweets != []:
+                save_stream_data(filename, tweet, i)
+        except urllib.error.HTTPError as err:
+            if err.code == 429:
+                print("Sleep window from Twitter API. 15 mins left")
+                time.sleep(5 * 60)
+                print("Working again...")
 
 
 def save_stream_data(filename, data, i):
     act_file = filename + '_' + str(i)
     act_file = 'tweets/from_stream/' + act_file
-    t = AttrDict()
-    t.update(data)
-    with open(filename, "wb") as f:
+    tweets = [AttrDict() for _ in range(len(data))]
+    t = [t.update(data[i]) for i, t in enumerate(tweets)]
+    with open(act_file, "wb") as f:
         pickle.dump(t, f)
     f.close()
 
