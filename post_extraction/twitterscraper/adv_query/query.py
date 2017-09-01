@@ -7,7 +7,7 @@ from multiprocessing.pool import Pool
 
 import requests
 from fake_useragent import UserAgent
-from tweet import Tweet
+from post_extraction.twitterscraper.adv_query.tweet import Tweet
 
 
 ua = UserAgent()

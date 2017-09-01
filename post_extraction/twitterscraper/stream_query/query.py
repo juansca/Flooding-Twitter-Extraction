@@ -1,7 +1,7 @@
 import datetime
 import sys
-from config import consumer_key, consumer_secret
-from config import access_token, access_token_secret
+from post_extraction.twitterscraper.stream_query.config import consumer_key, consumer_secret
+from post_extraction.twitterscraper.stream_query.config import access_token, access_token_secret
 from TwitterSearch import TwitterSearchOrder, TwitterSearch
 from TwitterSearch import TwitterSearchException
 
@@ -26,6 +26,13 @@ class Query():
         keywords = self.keywords
 
         try:
+            info_str = "Scrapping Tweets having: \n \
+            Keywords: {} \n \
+            Lat: {}  Long: {}  Radius {} \n \
+            Tweets with urls: {} \n \
+            And with media: {} \n"
+            print(info_str.format(keywords, latitude,
+                                  longitude, radius, urls, media))
             tso = TwitterSearchOrder()
             tso.set_keywords(keywords)  # we want to see 'keywords' tweets only
             tso.set_language('es')  # Only in Spanish
@@ -54,8 +61,8 @@ class Query():
             # let's start the action
             tweets = 0
             metadata = True
-            while(metadata):
 
+            while(metadata):
                 # Query the Twitter API
                 response = ts.search_tweets(tso)
                 # check if there are statuses returned and whether we still
