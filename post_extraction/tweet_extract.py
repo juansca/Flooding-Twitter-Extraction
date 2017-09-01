@@ -94,9 +94,10 @@ def save_stream_data(filename, data, i):
     act_file = filename + '_' + str(i)
     act_file = 'tweets/from_stream/' + act_file
     tweets = [AttrDict() for _ in range(len(data))]
-    t = [t.update(data[i]) for i, t in enumerate(tweets)]
+    for t, d in zip(tweets, data):
+        t.update(d)
     with open(act_file, "wb") as f:
-        pickle.dump(t, f)
+        pickle.dump(tweets, f)
     f.close()
 
 
