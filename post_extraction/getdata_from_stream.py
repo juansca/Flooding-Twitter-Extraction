@@ -52,11 +52,11 @@ class StreamFloodingData:
             for tweets in self._load_from_pickle(f):
                 for tweet in tweets:
                     if tweet is not None:
-                        urls += [url['expanded_url'] for url in
+                        urls += [url['url'] for url in
                                  tweet.entities['urls'] if url is not None]
         return urls
 
-    def media_urls(self):
+    def simple_media_urls(self):
         """Search media urls attached in to tweets saved on the given
         file.
         """
@@ -68,8 +68,33 @@ class StreamFloodingData:
                     if tweet is not None:
                         try:
                             for media in tweet.entities['media']:
-                                if media['type'] != 'photo':
-                                    media_urls.append(media['media_url'])
+                                media_urls.append(media['media_url'])
                         except KeyError:
+                            continue
+        return media_urls
+
+    def extended_media_urls(self):
+        """Search media urls attached in to tweets saved on the given
+        file.
+        """
+        filenames = self.filenames
+        media_urls = []
+        for f in filenames:
+            for tweets in self._load_from_pickle(f):
+                for tweet in tweets:
+                    if tweet is not None:
+                        try:
+                            for media in tweet.extended_entities['media']:
+                                if media['type'] == 'video':
+                                    url_media = media['expanded_url']
+                                    url_media = url_media[:8] + "mobile." + \
+                                                url_media[8:]
+                                else:
+                                    url_media = media['expanded_url']
+                                my_media = (media['type'], url_media)
+                                media_urls.append(my_media)
+                        except KeyError:
+                            continue
+                        except AttributeError:
                             continue
         return media_urls
