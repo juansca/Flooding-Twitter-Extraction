@@ -79,15 +79,14 @@ def textract(loc, words, filename, n=10, date=None, stream=True):
                     save_stream_data(filename, tweets, i)
                     tweets = []
                 i += 1
-                print("holi")
         except KeyboardInterrupt as k:
             print("\nSaving the remaining tweets collected...")
             if tweets != []:
-                save_stream_data(filename, tweet, i)
+                save_stream_data(filename, tweets, i)
         except urllib.error.HTTPError as err:
             if err.code == 429:
                 print("Sleep window from Twitter API. 15 mins left")
-                time.sleep(5 * 60)
+                time.sleep(15 * 60)
                 print("Working again...")
 
 
