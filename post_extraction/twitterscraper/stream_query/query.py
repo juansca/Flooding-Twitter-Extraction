@@ -41,7 +41,6 @@ class Query():
 
             if until:
                 until = datetime.datetime.strptime(until, "%Y-%m-%d").date()
-                print(isinstance(until, datetime.date))
                 tso.set_until(until)
             if urls:
                 tso.set_link_filter()  # urls on tweets
@@ -76,7 +75,11 @@ class Query():
                     # current ID is lower than current next_max_id?
                     if (tweet_id < next_max_id) or (next_max_id == 0):
                         next_max_id = tweet_id
-                        next_max_id -= 1  # decrement to avoid seeing this tweet again
+                        # decrement to avoid seeing this tweet again
+                        next_max_id -= 1
+                    # Avoid extract retweets
+                    if 'retweeted_status' in tweet.keys():
+                        continue
 
                     if localization:
                         coordinates = tweet['coordinates'] is not None
