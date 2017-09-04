@@ -71,7 +71,7 @@ def textract(loc, words, filename, n=10, date=None, stream=True):
             # Collect and Save tweets
             for tweet in query.search(latitude=latitude,
                                       longitude=longitude,
-                                      radius=radius):
+                                      radius=radius, until=date):
                 tweet['latitude'] = latitude
                 tweet['longitude'] = longitude
                 tweets.append(tweet)
@@ -111,4 +111,4 @@ if __name__ == '__main__':
     loc = opts['-g']
     words = opts['-w']
     filename = opts['-o']
-    textract(n, date, loc, words, filename)
+    textract(loc, words, filename, n=n, date=date, stream=False)

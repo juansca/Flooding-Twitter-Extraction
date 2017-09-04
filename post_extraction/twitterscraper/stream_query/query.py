@@ -18,7 +18,7 @@ class Query():
     def __init__(self, keywords):
         self.keywords = keywords
 
-    def search(self, media=True, urls=True, until=False,
+    def search(self, media=True, urls=True, until=None,
                localization=False,  # TODO: Any tweets found with 'True'
                latitude=-31.4135000, longitude=-64.1810500, radius=50):
         """Query for tweets
@@ -30,16 +30,16 @@ class Query():
             Keywords: {} \n \
             Lat: {}  Long: {}  Radius {} \n \
             Tweets with urls: {} \n \
+            Until: {} \n \
             And with media: {} \n"
             print(info_str.format(keywords, latitude,
-                                  longitude, radius, urls, media))
+                                  longitude, radius, urls, until, media))
             tso = TwitterSearchOrder()
             tso.set_keywords(keywords)  # we want to see 'keywords' tweets only
             tso.set_language('es')  # Only in Spanish
             tso.set_include_entities(media)  # all those entity information
             tso.set_geocode(latitude, longitude, radius, imperial_metric=False)
-
-            if until:
+            if until is not None:
                 until = datetime.datetime.strptime(until, "%Y-%m-%d").date()
                 tso.set_until(until)
             if urls:
@@ -90,8 +90,8 @@ class Query():
                     progress(format_str.format(tweets))
                     yield tweet
 
-                # set lowest ID as MaxID
-                tso.set_max_id(next_max_id)
+                    # set lowest ID as MaxID
+                    tso.set_max_id(next_max_id)
 
         except TwitterSearchException as e:
             print(e)

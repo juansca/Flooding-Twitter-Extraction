@@ -105,7 +105,7 @@ class StreamFloodingData:
                                     video = from_max_bitrate(video_info)
                                     url_media = video['url']
                                 else:
-                                    url_media = media['expanded_url']
+                                    url_media = media['media_url']
                                 my_media = (media['type'], url_media)
                                 media_urls.append(my_media)
                         except KeyError:
