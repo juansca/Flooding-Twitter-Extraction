@@ -77,6 +77,20 @@ class StreamFloodingData:
         """Search media urls attached in to tweets saved on the given
         file.
         """
+        def from_max_bitrate(lst):
+            the_max = lst[0]
+            for d in lst[1:]:
+                url = d['url']
+                # I only want the mp4 files
+                if url[len(url) - 4:len(url)] == '.mp4':
+                    try:
+                        if d['bitrate'] > the_max['bitrate']:
+                            the_max = d
+                    # Sometimes, the first element has not the bitrate key
+                    except KeyError:
+                        the_max = d
+            return the_max
+
         filenames = self.filenames
         media_urls = []
         for f in filenames:
@@ -86,9 +100,10 @@ class StreamFloodingData:
                         try:
                             for media in tweet.extended_entities['media']:
                                 if media['type'] == 'video':
-                                    url_media = media['expanded_url']
-                                    url_media = url_media[:8] + "mobile." + \
-                                                url_media[8:]
+                                    video_info = media['video_info']['variants']
+                                    # I want the bigger video
+                                    video = from_max_bitrate(video_info)
+                                    url_media = video['url']
                                 else:
                                     url_media = media['expanded_url']
                                 my_media = (media['type'], url_media)
