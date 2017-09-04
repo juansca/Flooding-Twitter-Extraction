@@ -102,6 +102,7 @@ ENV/
 
 *config.py
 /tweets/*
+*.mp4
 *.jpg
 *.tar.*
 map_filtering/basemap-1.1.0/*
