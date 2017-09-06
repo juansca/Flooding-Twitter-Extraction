@@ -35,7 +35,8 @@ class Query():
             print(info_str.format(keywords, latitude,
                                   longitude, radius, urls, until, media))
             tso = TwitterSearchOrder()
-            tso.set_keywords(keywords)  # we want to see 'keywords' tweets only
+            # we want to see 'keywords' tweets only
+            tso.set_keywords(keywords, or_operator=True)
             tso.set_language('es')  # Only in Spanish
             tso.set_include_entities(media)  # all those entity information
             tso.set_geocode(latitude, longitude, radius, imperial_metric=False)

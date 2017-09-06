@@ -82,7 +82,7 @@ class StreamFloodingData:
             for d in lst[1:]:
                 url = d['url']
                 # I only want the mp4 files
-                if url[len(url) - 4:len(url)] == '.mp4':
+                if url[-4:] == '.mp4':
                     try:
                         if d['bitrate'] > the_max['bitrate']:
                             the_max = d
@@ -93,7 +93,9 @@ class StreamFloodingData:
 
         filenames = self.filenames
         media_urls = []
+        # All files will be processed
         for f in filenames:
+            # In every file (probably) a lot of tweets objects were saved
             for tweets in self._load_from_pickle(f):
                 for tweet in tweets:
                     if tweet is not None:
