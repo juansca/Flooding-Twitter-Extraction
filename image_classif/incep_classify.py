@@ -1,9 +1,9 @@
 import numpy as np
 import tensorflow as tf
-from os import listdir
+from os import listdir, rename
+import fnmatch
 
-
-imagePath = 'rio.jpg'
+imagePath = 'images/tweets_attached/'
 modelFullPath = 'image_classif/retrained_graph.pb'
 labelsFullPath = 'image_classif/retrained_labels.txt'
 
@@ -22,6 +22,10 @@ class ImageClassifier():
             try:
                 yield (image, self._run_inference_on_image(image))
             except tf.errors.InvalidArgumentError:
+                videos = "images/videos/"
+                name = image.split('/')[-1]
+                rename(image, videos + name)
+
                 print(image)
 
     def classify_file(self, imagePath):
@@ -84,5 +88,37 @@ class ImageClassifier():
 
 
 if __name__ == '__main__':
-    a = Image_Classifier()
-    print(a.classify_file(imagePath))
+    a = ImageClassifier(imagePath)
+    utils = "images/utiles/"
+    inutils = "images/inutiles/"
+    jpg = len(fnmatch.filter(listdir(imagePath), '*.jpg'))
+    png = len(fnmatch.filter(listdir(imagePath), '*.png'))
+    advertisement = "\t\t\t++++++++++++++++++\n   \
+                     {} JPG's files    \n   \
+                     and {} PNG's files\n   \
+                     will be classified\n   \
+                     ++++++++++++++++++"
+    ngb = 2
+    while jpg != 0 and png != 0:
+        print(advertisement.format(jpg, png))
+        try:
+            for image, infer in a.classify_dir():
+                name = image.split('/')[-1]
+                if infer[0] != 'neither':
+                    rename(image, utils + name)
+                else:
+                    rename(image, inutils + name)
+                print(image, infer)
+        except ValueError:
+            warning = "\t\t\t----------------------------\n \
+                       ----------------------------\n \
+                        WARNING {} GB in your RAM!!\n \
+                        YOU CAN STOP AND CONTINUE  \n \
+                            LATER IF YOU WISH      \n \
+                        ---------------------------\n \
+                        ---------------------------"
+            print(warning.format(ngb))
+            jpg = len(fnmatch.filter(listdir(imagePath), '*.jpg'))
+            png = len(fnmatch.filter(listdir(imagePath), '*.png'))
+            ngb += 2
+            pass
