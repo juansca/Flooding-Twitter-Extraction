@@ -8,8 +8,7 @@ You must have anaconda installed in order to install the package and the environ
 Download anaconda from [here](https://www.continuum.io/downloads).
 
 ```
-conda env create -f environment.yml;
-pip install -r requirements.py
+conda env create -f environment.yml
 ```
 
 **Note**: This will create a new environment.
