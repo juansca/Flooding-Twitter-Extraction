@@ -9,8 +9,9 @@ labelsFullPath = 'image_classif/retrained_labels.txt'
 
 
 class ImageClassifier():
-    def __init__(self, path_dir=None):
+    def __init__(self, path_dir=None, less=False):
         self.path_dir = path_dir
+        self.less = less
 
     def classify_dir(self):
         """Run inference on image over all images on give directory.
@@ -56,6 +57,7 @@ class ImageClassifier():
 
     def _run_inference_on_image(self, imagePath):
         answer = None
+        less = self.less
 
         if not tf.gfile.Exists(imagePath):
             tf.logging.fatal('File does not exist %s', imagePath)
@@ -77,10 +79,12 @@ class ImageClassifier():
             f = open(labelsFullPath, 'rb')
             lines = f.readlines()
             labels = [str(w).replace("\n", "") for w in lines]
-            for node_id in top_k:
-                human_string = labels[node_id]
-                score = predictions[node_id]
-                print('%s (score = %.5f)' % (human_string, score))
+            # Delete this block if less
+            if not less:
+                for node_id in top_k:
+                    human_string = labels[node_id]
+                    score = predictions[node_id]
+                    print('%s (score = %.5f)' % (human_string, score))
 
             label = self._format_from_label(labels[top_k[0]])
             answer = label, predictions[top_k[0]]
@@ -88,7 +92,7 @@ class ImageClassifier():
 
 
 if __name__ == '__main__':
-    a = ImageClassifier(imagePath)
+    a = ImageClassifier(imagePath, less=True)
     utils = "images/utiles/"
     inutils = "images/inutiles/"
     jpg = len(fnmatch.filter(listdir(imagePath), '*.jpg'))
@@ -99,7 +103,7 @@ if __name__ == '__main__':
                      will be classified\n   \
                      ++++++++++++++++++"
     ngb = 2
-    while jpg != 0 and png != 0:
+    while jpg != 0 or png != 0:
         print(advertisement.format(jpg, png))
         try:
             for image, infer in a.classify_dir():
@@ -110,15 +114,4 @@ if __name__ == '__main__':
                     rename(image, inutils + name)
                 print(image, infer)
         except ValueError:
-            warning = "\t\t\t----------------------------\n \
-                       ----------------------------\n \
-                        WARNING {} GB in your RAM!!\n \
-                        YOU CAN STOP AND CONTINUE  \n \
-                            LATER IF YOU WISH      \n \
-                        ---------------------------\n \
-                        ---------------------------"
-            print(warning.format(ngb))
-            jpg = len(fnmatch.filter(listdir(imagePath), '*.jpg'))
-            png = len(fnmatch.filter(listdir(imagePath), '*.png'))
-            ngb += 2
-            pass
+            raise
