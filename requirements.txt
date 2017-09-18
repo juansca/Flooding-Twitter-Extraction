@@ -1,0 +1,8 @@
+geopy
+pyshp
+bs4
+coala_utils
+imgkit
+TwitterSearch
+fake_useragent
+-e .
