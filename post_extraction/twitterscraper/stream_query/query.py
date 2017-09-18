@@ -1,6 +1,7 @@
 import datetime
 import sys
-from post_extraction.twitterscraper.stream_query.config import consumer_key, consumer_secret
+from post_extraction.twitterscraper.stream_query.config import consumer_key
+from post_extraction.twitterscraper.stream_query.config import consumer_secret
 from post_extraction.twitterscraper.stream_query.config import access_token, access_token_secret
 from TwitterSearch import TwitterSearchOrder, TwitterSearch
 from TwitterSearch import TwitterSearchException
@@ -96,6 +97,7 @@ class Query():
 
         except TwitterSearchException as e:
             print(e)
+            raise
 
 
 if __name__ == '__main__':

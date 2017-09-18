@@ -19,7 +19,6 @@ python post_extraction/tweet_extract.py -n 30 -d '2015-02-10, 2015-02-20' -w 'in
 """
 from docopt import docopt
 import urllib
-import time
 from geopy.geocoders import Nominatim
 from post_extraction.twitterscraper.adv_query.query import query_tweets
 from post_extraction.twitterscraper.stream_query.query import Query
@@ -83,11 +82,6 @@ def textract(loc, words, filename, n=10, date=None, stream=True):
             print("\nSaving the remaining tweets collected...")
             if tweets != []:
                 save_stream_data(filename, tweets, i)
-        except urllib.error.HTTPError as err:
-            if err.code == 429:
-                print("Sleep window from Twitter API. 15 mins left")
-                time.sleep(15 * 60)
-                print("Working again...")
 
 
 def save_stream_data(filename, data, i):
