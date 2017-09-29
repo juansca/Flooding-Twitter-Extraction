@@ -24,7 +24,7 @@ from post_extraction.twitterscraper.adv_query.query import query_tweets
 from post_extraction.twitterscraper.stream_query.query import Query
 from post_extraction.format_input import create_query
 import pickle
-
+import os
 
 class AttrDict(dict):
     def __init__(self, *args, **kwargs):
@@ -45,15 +45,26 @@ def textract(loc, words, filename, n=10, date=None, stream=True):
     if not stream:
         print("Advanced Query scrapping starting...")
         # Just join everything and create the query
+        directory = 'tweets/from_adv_search/'
         adv_query = create_query(date, words, loc)
         tweets = [tweet for tweet in query_tweets(adv_query, n)[:n]]
-        filename = 'tweets/from_adv_search/' + filename
+        filename = directory + filename
+        try:
+            os.stat(directory)
+        except FileNotFoundError:
+            os.mkdir(directory)
         with open(filename, "wb") as f:
             pickle.dump(tweets, f)
         f.close()
 
     else:
         print("Streamming scrapping starting...")
+        directory = 'tweets/from_stream/'
+        try:
+            os.stat(directory)
+        except FileNotFoundError:
+            os.mkdir(directory)
+
         loc = loc.split(', ')
         place = loc[0]
         geolocator = Nominatim()
@@ -75,22 +86,26 @@ def textract(loc, words, filename, n=10, date=None, stream=True):
                 tweet['longitude'] = longitude
                 tweets.append(tweet)
                 if i % 10 == 0:  # Save tweets
-                    save_stream_data(filename, tweets, i)
+                    act_file = filename + '_' + str(i)
+                    act_file = directory + act_file
+
+                    save_stream_data(act_file, tweets)
                     tweets = []
                 i += 1
         except KeyboardInterrupt as k:
             print("\nSaving the remaining tweets collected...")
+            act_file = filename + '_' + str(i)
+            act_file = directory + act_file
+
             if tweets != []:
-                save_stream_data(filename, tweets, i)
+                save_stream_data(act_file, tweets)
 
 
-def save_stream_data(filename, data, i):
-    act_file = filename + '_' + str(i)
-    act_file = 'tweets/from_stream/' + act_file
+def save_stream_data(filename, data):
     tweets = [AttrDict() for _ in range(len(data))]
     for t, d in zip(tweets, data):
         t.update(d)
-    with open(act_file, "wb") as f:
+    with open(filename, "wb") as f:
         pickle.dump(tweets, f)
     f.close()
 
