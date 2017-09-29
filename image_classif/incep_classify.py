@@ -12,6 +12,7 @@ class ImageClassifier():
     def __init__(self, path_dir=None, less=False):
         self.path_dir = path_dir
         self.less = less
+        self.processing = None
 
     def classify_dir(self):
         """Run inference on image over all images on give directory.
@@ -20,14 +21,8 @@ class ImageClassifier():
         path_dir = self.path_dir
         files = (path_dir + f for f in listdir(path_dir))
         for image in files:
-            try:
-                yield (image, self._run_inference_on_image(image))
-            except tf.errors.InvalidArgumentError:
-                videos = "images/videos/"
-                name = image.split('/')[-1]
-                rename(image, videos + name)
-
-                print(image)
+            self.processing = image
+            yield (image, self._run_inference_on_image(image))
 
     def classify_file(self, imagePath):
         """Run inference on only one image.
@@ -93,8 +88,17 @@ class ImageClassifier():
 
 if __name__ == '__main__':
     a = ImageClassifier(imagePath, less=True)
-    utils = "images/utiles/"
-    inutils = "images/inutiles/"
+    tol = 0.65
+    utils_dir = "images/utiles/"
+    inutils_dir = "images/inutiles/"
+    videos_dir = "images/videos/"
+
+    for directory in [utils_dir, inutils_dir, videos_dir]:
+        try:
+            os.stat(directory)
+        except FileNotFoundError:
+            os.mkdir(directory)
+
     jpg = len(fnmatch.filter(listdir(imagePath), '*.jpg'))
     png = len(fnmatch.filter(listdir(imagePath), '*.png'))
     advertisement = "\t\t\t++++++++++++++++++\n   \
@@ -103,15 +107,21 @@ if __name__ == '__main__':
                      will be classified\n   \
                      ++++++++++++++++++"
     ngb = 2
-    while jpg != 0 or png != 0:
-        print(advertisement.format(jpg, png))
+    print(advertisement.format(jpg, png))
+    while len(os.listdir(imagePath)) > 0:
         try:
             for image, infer in a.classify_dir():
                 name = image.split('/')[-1]
-                if infer[0] != 'neither':
-                    rename(image, utils + name)
+                if infer[0] != 'neither' or infer[1] < tol:
+                    rename(image, utils_dir + name)
                 else:
-                    rename(image, inutils + name)
+                    rename(image, inutils_dir + name)
                 print(image, infer)
+
+        except tf.errors.InvalidArgumentError:
+            image = a.processing
+            name = image.split('/')[-1]
+            rename(image, videos_dir + name)
+
         except ValueError:
             raise
