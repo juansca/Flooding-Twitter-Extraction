@@ -7,6 +7,11 @@ from image_classif.incep_classify import ImageClassifier
 import time
 from TwitterSearch import TwitterSearchException
 from utils import download_media, webpage_screenshot
+import os
+from os import listdir, rename
+import fnmatch
+import tensorflow as tf
+
 
 pathDir = 'images/tweets_attached/'
 
@@ -35,10 +40,46 @@ class Test():
         else:
             textract(place, keywords, filename, stream)
 
-    def classify_test(self):
-        model = ImageClassifier('images/' + pathDir)
-        for classification in model.classify_dir():
-            print(classification)
+    def classify_test(self, tol=0.65):
+        imagePath = 'images/tweets_attached/'
+        model = ImageClassifier(imagePath)
+
+        utils_dir = "images/utiles/"
+        inutils_dir = "images/inutiles/"
+        videos_dir = "images/videos/"
+
+        for directory in [utils_dir, inutils_dir, videos_dir]:
+            try:
+                os.stat(directory)
+            except FileNotFoundError:
+                os.mkdir(directory)
+
+        jpg = len(fnmatch.filter(listdir(imagePath), '*.jpg'))
+        png = len(fnmatch.filter(listdir(imagePath), '*.png'))
+        advertisement = "\t\t\t++++++++++++++++++\n   \
+                         {} JPG's files    \n   \
+                         and {} PNG's files\n   \
+                         will be classified\n   \
+                         ++++++++++++++++++"
+        ngb = 2
+        print(advertisement.format(jpg, png))
+        while len(os.listdir(imagePath)) > 0:
+            try:
+                for image, infer in model.classify_dir():
+                    name = image.split('/')[-1]
+                    if infer[0] != 'neither' or infer[1] < tol:
+                        rename(image, utils_dir + name)
+                    else:
+                        rename(image, inutils_dir + name)
+                    print(image, infer)
+
+            except tf.errors.InvalidArgumentError:
+                image = model.processing
+                name = image.split('/')[-1]
+                rename(image, videos_dir + name)
+
+            except ValueError:
+                raise
 
     def screenshot_test(self):
         directory = 'images/webpages_shots/'
@@ -59,7 +100,7 @@ class Test():
         """This is the method to test download media from tweets
         """
         # Download media attached on the tweets
-        data = StreamFloodingData(self.path)
+        data = StreamFloodingData('/images/')
         media_urls = data.extended_media_urls()
         i = 0
         errors = []
