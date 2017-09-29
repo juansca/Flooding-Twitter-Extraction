@@ -6,7 +6,7 @@ from post_extraction.getdata_from_stream import StreamFloodingData
 from image_classif.incep_classify import ImageClassifier
 import time
 from TwitterSearch import TwitterSearchException
-
+from utils import download_media, webpage_screenshot
 
 pathDir = 'images/tweets_attached/'
 
@@ -40,28 +40,8 @@ class Test():
         for classification in model.classify_dir():
             print(classification)
 
-    def _download_media(self, url, name):
-        """Download a image from a url."""
-        try:
-            os.stat(pathDir)
-        except FileNotFoundError:
-            os.mkdir(pathDir)
-        extension = url[len(url) - 4:len(url)]
-        name = pathDir + name + extension
-        urllib.request.urlretrieve(url, name)
-
-    def _webpage_screenshot(self, url, name):
-        """Take a screenshot from the page correspondly at the given url."""
-        directory = 'images/webpages_shots/'
-        try:
-            os.stat(directory)
-        except FileNotFoundError:
-            os.mkdir(directory)
-
-        filename = directory + name
-        from_url(url, filename + '.jpg')
-
     def screenshot_test(self):
+        directory = 'images/webpages_shots/'
         # Save the screenshot correspondly with the urls
         data = StreamFloodingData(self.path)
         urls = data.urls_from_text()
@@ -70,7 +50,7 @@ class Test():
         i = 0
         for url in urls:
             try:
-                self._webpage_screenshot(url, str(i))
+                self._webpage_screenshot(url, str(i), directory)
                 i += 1
             except URLError:
                 continue
@@ -78,16 +58,15 @@ class Test():
     def dwnl_media_test(self):
         # Download media attached on the tweets
         data = StreamFloodingData(self.path)
-        print(data.urls_from_text())
-        print(data.images_urls())
+        media_urls = data.extended_media_urls()
         i = 0
         errors = []
-        for url in text:
+        for url in media_urls:
             url = url[1]
             i += 1
             if url[:4] == 'http':
                 try:
-                    self._download_media(url, str(i))
+                    download_media(url, str(i), pathDir)
                 except HTTPError:
                     print("error in", url)
                     errors.append(url)
