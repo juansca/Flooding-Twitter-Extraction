@@ -13,6 +13,10 @@ pathDir = 'images/tweets_attached/'
 
 def download_media(url, name):
     """Download a image from a url."""
+    try:
+        os.stat(pathDir)
+    except FileNotFoundError:
+        os.mkdir(pathDir)
     extension = url[len(url) - 4:len(url)]
     name = pathDir + name + extension
     urllib.request.urlretrieve(url, name)
@@ -20,7 +24,13 @@ def download_media(url, name):
 
 def webpage_screenshot(url, name):
     """Take a screenshot from the page correspondly at the given url."""
-    filename = 'images/webpages_shots/' + name
+    directory = 'images/webpages_shots/'
+    try:
+        os.stat(directory)
+    except FileNotFoundError:
+        os.mkdir(directory)
+
+    filename = directory + name
     from_url(url, filename + '.jpg')
 
 
