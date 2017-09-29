@@ -56,6 +56,8 @@ class Test():
                 continue
 
     def dwnl_media_test(self):
+        """This is the method to test download media from tweets
+        """
         # Download media attached on the tweets
         data = StreamFloodingData(self.path)
         media_urls = data.extended_media_urls()
